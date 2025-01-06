@@ -9,12 +9,22 @@ dotenv.config();
 // TODO: Define a class for the Weather object
 class Weather {
   city!: string;
-  date!: number;
-  icon!: ImageBitmap;
+  date!: string;
+  icon!: string;
   iconDescription!: string;
   tempF!: number;
-  wind!: number;
+  windSpeed!: number;
   humidity!: number;
+
+  constructor(city: string, date: string, icon: string, iconDescription: string, tempF: number, windSpeed: number, humidity: number) {
+    this.city = city;
+    this.date = date;
+    this.icon = icon;
+    this.iconDescription = iconDescription;
+    this.tempF = tempF;
+    this.windSpeed = windSpeed;
+    this.humidity = humidity
+  }
 }
 // TODO: Complete the WeatherService class
 class WeatherService {
@@ -31,7 +41,7 @@ class WeatherService {
   // TODO: Create fetchAndDestructureLocationData method
   private async fetchAndDestructureLocationData() {
     const locationDataResp = await fetch(this.buildGeocodeQuery())
-    
+
     const locationData = await locationDataResp.json()
     console.log(locationData, "Location Data");
     const lat = locationData[0].lat
@@ -42,6 +52,7 @@ class WeatherService {
   // TODO: Create buildWeatherQuery method
   private async buildWeatherQuery() {
     const { lat, lon } = await this.fetchAndDestructureLocationData()
+    console.log(`Lat for city: ${lat}\nLon for city: ${lon}`);
     const weatherQuery = `${this.baseURL}/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${this.apiKey}`
     return weatherQuery
   }
@@ -49,32 +60,71 @@ class WeatherService {
   private async fetchWeatherData() {
     const weatherDataFetch = await this.buildWeatherQuery()
     const weatherDataResp = await fetch(weatherDataFetch);
-    console.log(weatherDataResp, "weatherDataResp")
     const weatherData = await weatherDataResp.json();
-    console.log(weatherData, 1)
+    console.log(weatherData, "hi")
     return weatherData;
   }
   // TODO: Build parseCurrentWeather method
   private async parseCurrentWeather() {
     const currentWeatherFetch = await this.fetchWeatherData();
-    console.log(currentWeatherFetch);
-    const currentWeather = await JSON.parse(currentWeatherFetch)
-    return currentWeather
+    //console.log(currentWeatherFetch);
+
+    //const currentWeather = await currentWeatherFetch
+    //console.log(currentWeather, 'current weather')
+    return currentWeatherFetch
   }
   // TODO: Complete buildForecastArray method
   private async buildForecastArray() {
-    const currentWeather = await this.parseCurrentWeather()
-    const forecast = currentWeather.map((weather: Weather) => {
-      [
-        weather.tempF,
-        weather.wind,
-        weather.humidity
-      ]
-    })
-    return forecast
+    const forecast: Weather[] = []
+    const weatherInfo = await this.parseCurrentWeather()
+    // const smallWeather = [currentWeather.list[0], currentWeather.list[1], currentWeather.list[2]];
+    // console.log(smallWeather)
+
+    for  (let i = 0; i < weatherInfo.list.length; i++) {
+      const weatherObj = new Weather (
+        weatherInfo.city.name, // City
+        weatherInfo.list[i].dt_txt, // Date
+        weatherInfo.list[i].weather[0].icon, // Icon
+        weatherInfo.list[i].weather[0].description, // Icon Description
+        weatherInfo.list[i].main.temp, // TempF
+        weatherInfo.list[i].wind.speed,
+        weatherInfo.list[i].main.humidity, // Humidity
+    )
+    forecast.push(weatherObj)
+    }
+    // const forecast: Weather[] = weatherInfo.list.map((weather: any, index: number) => {
+    //   // console.log(weather)
+    // return  [
+    // index,
+    // this.cityName,
+    // weather.dt_txt,
+    // weather.weather[0].icon,
+    // weather.weather[0].description,
+    // weather.main.temp,
+    // weather.wind.speed,
+    // weather.main.humidity
+    //   ]
+    // })
+    // const forecast = currentWeather.list.map((weather: Weather, index: number) => {
+    //   [
+    //     index,
+    //     weather.city,
+    //     weather.date,
+    //     weather.icon,
+    //     weather.iconDescription,
+    //     weather.tempF,
+    //     weather.windSpeed,
+    //     weather.humidity
+    //   ]
+    // })
+    console.log(forecast, 'forecast')
+    // console.log(forecast.length);
+    // console.log(Weather)
+    return forecast;
   }
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(cityName: string) {
+    console.log("Getting weather for city: ", cityName);
     this.cityName = cityName
     const weather = await this.buildForecastArray()
     return weather
