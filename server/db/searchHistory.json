@@ -1,7 +1,14 @@
 [
-    {
-        "name": "Newport",
-        "id": 55055
-    }
+	{
+		"name": "Newport",
+		"id": 55055
+	},
+	{
+		"name": "Minneapolis",
+		"id": "89955d7a-684c-497d-bd41-88a243e4ac94"
+	},
+	{
+		"name": "Sydney",
+		"id": "908d2332-17a2-4411-af45-77019301e70c"
+	}
 ]
-

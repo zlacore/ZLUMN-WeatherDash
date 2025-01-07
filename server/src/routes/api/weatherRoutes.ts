@@ -13,14 +13,14 @@ router.post('/', async (_req: Request, res: Response) => {
   // console.log("WTF tho", getWeatherForCity, "I SAID");
   res.json(getWeatherForCity)
   // TODO: save city to search history
-
+  HistoryService.addCity(_req.body.cityName)
 });
 
 // TODO: GET search history
-router.get('/history', async (_req: Request, _res: Response) => {
+router.get('/history', async (_req: Request, res: Response) => {
   const searchHistory = await HistoryService.getCities()
   console.log('Search history route is working!')
-  return searchHistory
+  res.json(searchHistory)
 });
 
 // // * BONUS TODO: DELETE city from search history
